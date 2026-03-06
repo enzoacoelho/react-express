@@ -1,0 +1,37 @@
+name: Testes com docker
+
+on:
+    push:
+        branches: ["main"]
+    pull_request:
+    workflow_dispatch:
+
+jobs:
+    ci:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout 
+              uses: actions/checkout@v4
+              
+            - name: Subir containers com docker compose
+              run: docker compose up -d backend frontend
+
+            - name: Aguardar os serviços subirem
+              run: sleep 10 
+
+            - name: Executar testes com Cypress
+              run: docker compose run --rm cypress
+
+            - name: Salvar evidências
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                name: evidencias-cypress
+                path: | 
+                    tests/cypress-videos/
+                    tests/cypress-screenshots/
+
+            - name: Derrubar containers
+              if: always()
+              run: docker compose down$(date +%s)
