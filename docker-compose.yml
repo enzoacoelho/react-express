@@ -1,9 +1,22 @@
-version: "3.8"
 services:
+
+  database:
+    image: mysql:8
+    container_name: projeto-mysql
+
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: testdb
+
+    ports:
+      - "3306:3306"
+
+    networks:
+      - projeto-network
+
+
   backend:
-
     build: ./node-express-server
-
     container_name: projeto-backend
 
     ports:
@@ -11,33 +24,33 @@ services:
 
     environment:
       - PORT=8080
-      - HOST=0.0.0.0
+
+    depends_on:
+      - database
 
     networks:
-      - projeto-network 
+      - projeto-network
+
 
   frontend:
-
     build: ./react-client
-
     container_name: projeto-frontend
 
-    ports: 
-      - "8081:8081"
+    ports:
+      - "3000:3000"
 
     environment:
-      - PORT=8081
+      - PORT=3000
 
     depends_on:
       - backend
 
     networks:
-      - projeto-network 
+      - projeto-network
+
 
   cypress:
-
     build: ./tests
-
     container_name: projeto-cypress
 
     depends_on:
@@ -48,15 +61,14 @@ services:
       - projeto-network
 
     volumes:
-      - ./cypress-videos:/app/cypress/videos
-      - ./cypress-screenshots:/app/cypress/screenshots
+      - ./tests/cypress-videos:/app/cypress/videos
+      - ./tests/cypress-screenshots:/app/cypress/screenshots
 
     environment:
       - CYPRESS_API_URL=http://backend:8080
-      - CYPRESS_BASE_URL=http://frontend:3000      
+      - CYPRESS_BASE_URL=http://frontend:3000
+
 
 networks:
-
   projeto-network:
-
     driver: bridge

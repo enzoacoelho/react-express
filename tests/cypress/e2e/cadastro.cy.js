@@ -1,7 +1,7 @@
 describe('Cadastro de Tutorial', () => {
 
   beforeEach(() => {
-    cy.visit('http://localhost:8081/add')
+    cy.visit('/add')
   });
 
   afterEach(() => {
