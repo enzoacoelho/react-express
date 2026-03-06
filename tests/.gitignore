@@ -4,3 +4,7 @@ npm-debug.log
 dist/
 build/
 coverage/
+
+# Ignore test output files
+cypress/videos
+cypress/screenshots
