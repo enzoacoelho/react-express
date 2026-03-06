@@ -1,0 +1,62 @@
+version: "3.8"
+services:
+  backend:
+
+    build: ./node-express-server
+
+    container_name: projeto-backend
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      - PORT=8080
+      - HOST=0.0.0.0
+
+    networks:
+      - projeto-network 
+
+  frontend:
+
+    build: ./react-client
+
+    container_name: projeto-frontend
+
+    ports: 
+      - "3000:3000"
+
+    environment:
+      - PORT=3000
+
+    depends_on:
+      - backend
+
+    networks:
+      - projeto-network 
+
+  cypress:
+
+    build: ./tests
+
+    container_name: projeto-cypress
+
+    depends_on:
+      - backend
+      - frontend
+
+    networks:
+      - projeto-network
+
+    volumes:
+      - ./cypress-videos:/app/cypress/videos
+      - ./cypress-screenshots:/app/cypress/screenshots
+
+    environment:
+      - CYPRESS_API_URL=http://backend:8080
+      - CYPRESS_BASE_URL=http://frontend:3000      
+
+networks:
+
+  projeto-network:
+
+    driver: bridge
